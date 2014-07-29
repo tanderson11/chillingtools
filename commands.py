@@ -12,5 +12,4 @@ if __name__ == "__main__":
         if not os.path.exists(d):
             print "Building directory: " + d
             os.makedirs(d)
-    # Define commands here
-    pass
+    ### Define commands here ###

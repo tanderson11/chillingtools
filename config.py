@@ -8,7 +8,7 @@ SEARCH_SUFFIX = "search?"
 #
 
 # File configuration #
-FILE_ROOT = "/home/thayer/tools/files/"
+FILE_ROOT = os.environ["HOME"] + "chillingtools/files/"
 
 # Optional caching #
 CACHE_BOOL = True
