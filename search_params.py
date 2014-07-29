@@ -38,8 +38,10 @@ class Param():
         self.description = description
         self.require_all = require_all
 
-    def generate_request(self, query_list):
-        req = ""
+    def generate_request(self, query_list, req_all=False):
+        req = self.name
+        if req_all:
+            req += "_require_all"
         for i in query_list:
             req += i
             if i.index != len(query_list) - 1:
