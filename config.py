@@ -1,5 +1,7 @@
 ### Global variables ###
 
+CURL_ROOT = "curl"
+
 # URL configuration #
 URL_ROOT = "https://dev.chillingeffects.org/notices/"
 SEARCH_SUFFIX = "search?"
