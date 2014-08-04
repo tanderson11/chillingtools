@@ -1,7 +1,7 @@
+import os
+
 from requests import *
 from config import *
-
-
 
 if __name__ == "__main__":
     directories_needed = [FILE_ROOT]

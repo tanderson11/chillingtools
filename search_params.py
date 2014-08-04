@@ -31,12 +31,8 @@ require_all_names = ["term",
  "recipient_name",
 "works"]
 
+
 class Param():
-    def __init__(self, name, description, require_all):
-        self.name = name
-        self.description = description
-        self.require_all = require_all
-        
     def generate_request(self, query_list, req_all=False):
         req = self.name
         if req_all:
@@ -47,6 +43,11 @@ class Param():
             if query_list.index(i) != len(query_list) - 1:
                 req += "+"
         return req
+
+    def __init__(self, name, description, require_all):
+        self.name = name
+        self.description = description
+        self.require_all = require_all
 
 PARAMS = {}
 r = 0

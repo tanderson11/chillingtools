@@ -1,6 +1,8 @@
+import os
+
 ### Global variables ###
 
-CURL_ROOT = "curl"
+CURL_ROOT = "curl" # The default command for subprocess to execute.
 
 # URL configuration #
 URL_ROOT = "https://dev.chillingeffects.org/notices/"
@@ -8,7 +10,7 @@ SEARCH_SUFFIX = "search?"
 #
 
 # File configuration #
-FILE_ROOT = os.environ["HOME"] + "chillingtools/files/"
+FILE_ROOT = os.environ["HOME"] + "/chillingtools/files/"
 
 # Optional caching #
 CACHE_BOOL = True

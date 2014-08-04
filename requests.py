@@ -93,6 +93,7 @@ def output(dic):
             print "{0}:{1} | Require all: {2}.".format(k,str(v[0:-1]),"yes" if v[-1] else "no")
         else:
             print "{0}:{1}".format(k,str(v))
+
 def describe(name, obj):
     print "#"*10 + "\n{0}: {1}\n".format(name,obj.description) + "#"*10
 
@@ -115,6 +116,7 @@ def query(n):
 
 def interactive_search(fully_interactive=True, seed_dic={}):
     dic = {}
+    dic = dict(seed_dic.items() + dic.items())
     if fully_interactive:
         for n,o in PARAMS.iteritems():
             output(dic)
@@ -134,7 +136,6 @@ def interactive_search(fully_interactive=True, seed_dic={}):
                 dic[param_name] = query_list
             a = raw_input("Another? (Y/n) ")+"y"
 
-    dic = dict(seed_dic.items() + dic.items())
     return search(dic)
 
 def download(notice_id):
@@ -144,10 +145,10 @@ def download(notice_id):
         if os.path.exists(CACHE_ROOT + str(hashed)):
             restore = True
             return DOWNLOAD_HANDLER(recover(hashed))
-    response = DOWNLOAD_HANDLER(curl([], "{0}.json".format(str(notice_id))))
+    response = curl([], "{0}.json".format(str(notice_id)))
     if CACHE_BOOL and not restore:
         build(response, hashed)
-    return response
+    return DOWNLOAD_HANDLER(response)
 
 def download_set(l):
     ret_values = []
