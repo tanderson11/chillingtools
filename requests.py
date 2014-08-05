@@ -14,14 +14,12 @@ def default_download_handler(response):
 def default_search_handler(response):
     return json.loads(response)
 
-###
-
 ### Default handlers ###
 
 DOWNLOAD_HANDLER = default_download_handler
 SEARCH_HANDLER = default_search_handler
 
-###
+### Requests to the databse ###
 
 def curl(flags, completion, authentication_key=False):
     command = [CURL_ROOT]
@@ -33,14 +31,14 @@ def curl(flags, completion, authentication_key=False):
 
 def recover(hashed, search=False):
     print "Recovering cached file."
-    f = open(CACHE_ROOT + str(hashed), "r")
+    f = open(os.path.join(CACHE_ROOT, str(hashed)), "r")
     d = f.read()
     f.close()
     return d
 
 def build(data, hashed):
     print "Building file into cache."
-    f = open(CACHE_ROOT + str(hashed), "w+")
+    f = open(os.path.join(CACHE_ROOT, str(hashed)), "w+")
     f.write(data)
     f.close()
 
@@ -66,7 +64,7 @@ def search(dic):
             for qt in sorted(t[1]):
                 us += str(qt)
         hashed = abs(hash(us)) % (10 ** 15)
-        if os.path.exists(CACHE_ROOT + str(hashed)):
+        if os.path.exists(os.path.join(CACHE_ROOT + str(hashed))):
             restore = True
             return SEARCH_HANDLER(recover(hashed, True))
 
@@ -142,7 +140,7 @@ def download(notice_id):
     restore = False
     if CACHE_BOOL:
         hashed = abs(hash(str(notice_id))) % (10 ** 15)
-        if os.path.exists(CACHE_ROOT + str(hashed)):
+        if os.path.exists(os.path.join(CACHE_ROOT, str(hashed))):
             restore = True
             return DOWNLOAD_HANDLER(recover(hashed))
     response = curl([], "{0}.json".format(str(notice_id)))
