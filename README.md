@@ -44,9 +44,36 @@ To change the project's default handlers for downloading notices and searching t
 The Functions
 --------------
 
-There are numerous functions packaged with this project, but only a few our intended for the end user.
+There are numerous functions packaged with this project, but only a few our intended for the end user:
 
 `download`
 `download_set`
 `search`
 `interactive_search`
+
+## download
+
+The `download` function takes a notice id and an option, boolean `cache_override`. It downloads the notice corresponding to the id, using/building the cahce if the `CACHE_BOOL` evaluates to `True`, handles the raw json string with `DOWNLOAD_HANDLER`, and then returns the result.
+
+## download_set
+
+The `download_set` function takes a list and option boolean, `cache_override`. Each item of the list is interpreted as an integer and then the corresponding notice is downloaded via the `download` function. The results of the `download` function are accumulated in a list and returned when `download_set` complete.
+
+## search
+
+The `search` function takes a dictionary and option boolean, `cache_override`. The function uses the cache if `CACHE_BOOL` evaluates to `True`. The keys of the dictionary should be the names of search parameters from the search_params.py file (this file includes all valid paramaters on the Chilling Effects database and can be extended as desired). The values of the dictionary should be in one of the following forms:
+`["search_term"]`
+`["term1, "term2", "require_all"]`
+`["term1, "term2"]`
+
+Terms can include macros as discussed later in the documentation. For paramters that can accept multiple values, the final element of the list should be the string "require_all" if all values should be required.
+
+Each list of terms is passed to the corresponding `Param` object and the formatted by that object. The returned strings are concatenated and then the search request is issued. The result is handled by SEARCH_HANDLER and returned.
+
+## interactive_search
+
+The `interactive_search` function takes an optional boolean, `fully_interacitve` (defaults to `True`), an optional dictionary, `seed_dic` (defaults to `{}`), and an optional boolean `cache_override` (defaults to `False` as usual).
+
+The function features an interactive prompt. If `fully_interactive` evaluates to `True`, then the prompt will query the user about each `Param` defined in search_params.py. If `fully_interactive` evaluates to `False`, then the prompt will query the user about which `Param`s need to be accessed. The user input for search terms is parsed according to `process_user_input` which assumes terms are separated by the space character, `' '`. The user input can include macros as discussed later in the documentation.
+
+The parsed input is formatted properly and added to the `seed_dic`. The result is passed to the `search` function.

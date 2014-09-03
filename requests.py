@@ -145,7 +145,6 @@ def interactive_search(fully_interactive=True, seed_dic={}, cache_override=False
             output(dic)
             describe(n, o)
             query_list = query(n)
-            print query_list
             if query_list[0] != "":
                 dic[n] = query_list
     else:
@@ -176,5 +175,9 @@ def download(notice_id, cache_override=False):
 def download_set(l, cache_override=False):
     ret_values = []
     for i in l:
-        ret_values.append(download(i, cache_override=cache_override))
+        try:
+            ret_values.append(download(int(i), cache_override=cache_override))
+        except ValueError:
+            print "{0} could not be coerced to an integer."
+            return False
     return ret_values
