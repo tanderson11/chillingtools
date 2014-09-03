@@ -1,4 +1,5 @@
 from config import *
+from customize import *
 from search_params import *
 
 import os
@@ -7,19 +8,6 @@ import subprocess
 import json
 import time
 import calendar
-
-### Handler functions ###
-
-def default_download_handler(response):
-    return json.loads(response)
-
-def default_search_handler(response):
-    return json.loads(response)
-
-### Default handlers ###
-
-DOWNLOAD_HANDLER = default_download_handler
-SEARCH_HANDLER = default_search_handler
 
 ### Requests to the databse ###
 

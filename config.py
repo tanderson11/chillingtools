@@ -20,6 +20,4 @@ if CACHE_BOOL:
     CACHE_ROOT = os.path.join(FILE_ROOT, "cache")
 #
 
-###
-
 DEFAULT_FLAGS = ['-k']
