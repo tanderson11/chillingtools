@@ -40,3 +40,13 @@ Configuration and Customization
 To configure the project's global variables, edit their definitions in "config.py".
 
 To change the project's default handlers for downloading notices and searching the database, change the variables `DOWNLOAD_HANDLER` and `SEARCH_HANDLER` in the "requests.py" file.
+
+The Functions
+--------------
+
+There are numerous functions packaged with this project, but only a few our intended for the end user.
+
+`download`
+`download_set`
+`search`
+`interactive_search`

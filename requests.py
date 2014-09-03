@@ -5,6 +5,8 @@ import os
 import re
 import subprocess
 import json
+import time
+import calendar
 
 ### Handler functions ###
 
@@ -42,17 +44,30 @@ def build(data, hashed):
     f.write(data)
     f.close()
 
+def process_user_macro(args):
+    name = args[0]
+    args = args[1:]
+    required_args = {"date": 1, "range": 2, "daterange": 2}
+    try:
+        if required_args[name] != len(args):
+            raise Exception("{0} takes {1} arguments. You gave {2}".format(name, required_args, len(args)))
+    except KeyError:
+        raise Exception("{0} is not defined as a macro.".format(name))
+    if name == "date":
+        return str(calendar.timegm(time.strptime(args[0], "%Y/%m/%d"))) #year month day 2014/09/03
+    if name == "range":
+        return args[0] + ".." + args[1]
+    if name == "daterange":
+        return "{{range {{date {0}}} {{date {1}}}}}".format(args[0], args[1])
+
 def process_user_input(stream):
     stream = stream.lower()
-    commands = re.findall(r'{(.*)}', stream)
-    stream = re.sub(r'{.*}', ' ', stream)
+    while re.findall(r'{([^{}]*)}', stream):
+        stream = re.sub(r'{([^{}]*)}', lambda m: process_user_macro(m.group(1).split(' ')), stream)
     terms = stream.split(' ')
-    for c in commands:
-        if c == "":
-            pass
     return terms
 
-def search(dic):
+def search(dic, cache_override=False):
     restore = False
     if CACHE_BOOL:
         ul = []
@@ -64,7 +79,7 @@ def search(dic):
             for qt in sorted(t[1]):
                 us += str(qt)
         hashed = abs(hash(us)) % (10 ** 15)
-        if os.path.exists(os.path.join(CACHE_ROOT + str(hashed))):
+        if os.path.exists(os.path.join(CACHE_ROOT + str(hashed))) and not cache_override:
             restore = True
             return SEARCH_HANDLER(recover(hashed, True))
 
@@ -96,23 +111,30 @@ def describe(name, obj):
     print "#"*10 + "\n{0}: {1}\n".format(name,obj.description) + "#"*10
 
 def query(n):
-    if PARAMS[n].require_all:
-        query_string = raw_input("Value(s)? (separate by spaces) ")
-        query_string = query_string.lower()
-        query_list = process_user_input(query_string)
-        require_all = False
-        if len(query_list) > 1:
-            r = raw_input("Require all (Y/n)? ")+"y"
-            if r[0] == "y":
-                require_all = True
-        query_list.append(require_all)
-    else:
-        query_string = raw_input("Value? ")
-        query_string = query_string.lower()
-        query_list = process_user_input(query_string)
+    while True:
+        try:
+            if PARAMS[n].require_all:
+                query_string = raw_input("Value(s)? (separate by spaces) ")
+                query_string = query_string.lower()
+                query_list = process_user_input(query_string)
+                break
+
+                require_all = False
+                if len(query_list) > 1:
+                    r = raw_input("Require all (Y/n)? ")+"y"
+                    if r[0] == "y":
+                        require_all = True
+                query_list.append(require_all)
+            else:
+                query_string = raw_input("Value? ")
+                query_string = query_string.lower()
+                query_list = process_user_input(query_string)
+        except Exception as m:
+            print "{0} Please try again.".format(m)
+
     return query_list
 
-def interactive_search(fully_interactive=True, seed_dic={}):
+def interactive_search(fully_interactive=True, seed_dic={}, cache_override=False):
     dic = {}
     dic = dict(seed_dic.items() + dic.items())
     if fully_interactive:
@@ -134,13 +156,13 @@ def interactive_search(fully_interactive=True, seed_dic={}):
                 dic[param_name] = query_list
             a = raw_input("Another? (Y/n) ")+"y"
 
-    return search(dic)
+    return search(dic, cache_override=cache_override)
 
-def download(notice_id):
+def download(notice_id, cache_override=False):
     restore = False
     if CACHE_BOOL:
         hashed = abs(hash(str(notice_id))) % (10 ** 15)
-        if os.path.exists(os.path.join(CACHE_ROOT, str(hashed))):
+        if os.path.exists(os.path.join(CACHE_ROOT, str(hashed))) and not cache_override:
             restore = True
             return DOWNLOAD_HANDLER(recover(hashed))
     response = curl([], "{0}.json".format(str(notice_id)))
@@ -148,8 +170,8 @@ def download(notice_id):
         build(response, hashed)
     return DOWNLOAD_HANDLER(response)
 
-def download_set(l):
+def download_set(l, cache_override=False):
     ret_values = []
     for i in l:
-        ret_values.append(download(i))
+        ret_values.append(download(i, cache_override=cache_override))
     return ret_values

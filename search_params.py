@@ -22,14 +22,14 @@ descriptions = {"term": "The full-text query term",
                 "sort_by": "One of date_received asc, date_received desc, relevancy asc, or relevancy desc. Defaults to relevancy asc."}
 
 require_all_names = ["term",
- "title",
- "topics",
- "tags",
- "jurisdictions",
- "sender_name",
- "principal_name",
- "recipient_name",
-"works"]
+                     "title",
+                     "topics",
+                     "tags",
+                     "jurisdictions",
+                     "sender_name",
+                     "principal_name",
+                     "recipient_name",
+                     "works"]
 
 
 class Param():
