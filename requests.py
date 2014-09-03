@@ -68,6 +68,7 @@ def process_user_input(stream):
     return terms
 
 def search(dic, cache_override=False):
+    ### 
     restore = False
     if CACHE_BOOL:
         ul = []
@@ -86,13 +87,18 @@ def search(dic, cache_override=False):
     target = SEARCH_SUFFIX
     for n,ql in dic.iteritems():
         p = PARAMS[n]
-        if p.require_all:
-            req_all = ql.pop()
-            print ql
-            print p.generate_request(ql, req_all)
-            target += p.generate_request(ql, req_all) + "&"
+        if ql[-1] == "require_all":
+            ql.pop()
+            req_all = True
         else:
-            target += p.generate_request(ql) + "&"
+            req_all = False
+        for i in xrange(0, len(ql)):
+            t = ql[i]
+            del ql[i]
+            ql[i-1:i-1] = process_user_input(t)
+            print ql
+        print p.generate_request(ql, req_all)
+        target += p.generate_request(ql, req_all) + "&"
     flags = ['-H', 'Accept: application/json', '-H', 'Content-type: application/json']
     response = curl(flags, target)
     if CACHE_BOOL and not restore:
@@ -115,20 +121,17 @@ def query(n):
         try:
             if PARAMS[n].require_all:
                 query_string = raw_input("Value(s)? (separate by spaces) ")
-                query_string = query_string.lower()
-                query_list = process_user_input(query_string)
-                break
-
-                require_all = False
-                if len(query_list) > 1:
-                    r = raw_input("Require all (Y/n)? ")+"y"
-                    if r[0] == "y":
-                        require_all = True
-                query_list.append(require_all)
             else:
                 query_string = raw_input("Value? ")
-                query_string = query_string.lower()
-                query_list = process_user_input(query_string)
+            query_string = query_string.lower()
+            query_list = process_user_input(query_string)
+                
+            if PARAMS[n].require_all and len(query_list) > 1:
+                r = raw_input("Require all (Y/n)? ")+"y"
+                if r[0] == "y":
+                    query_list.append("require_all")
+
+            break
         except Exception as m:
             print "{0} Please try again.".format(m)
 
